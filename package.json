@@ -1,0 +1,16 @@
+{
+  "name": "mupli-core",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib/mupli-core.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bare": "^0.0.2",
+    "paramify": "^0.1.2"
+  }
+}
