@@ -1,18 +1,71 @@
+#
+
+## why?
+
+To improve reusability of code once written for different project. Framework force you to write code they way that it can be resuable for different applications.
+
+## What?
+
+Framework is a structure for
+
+-   monolith modularity ?
+
+## HOW to run project
+
+```
+node app/app.js
+```
+
+or with tags:
+
+```
+node app/app.js tags=dev,sit,someother
+```
+
+Note this will run only projects with tags.
+
 ## LifeCycle
 
 ### Initialization steps
+
 0. init
 1. routes -> fn(app)
-3. services -> services(appName, ctx)
-4. moduleExtentions -> moduleExtentions(appName) 
+    - ws -> fn(app)
+2. services -> services(appName, ctx)
+3. moduleExtentions -> moduleExtentions(appName)
 
+### Invocation steps
 
-###  Invocation steps 
 0. dispatch //TODO
 1. context -> context(appName, ctx)
-2. middlewears -> (ctx) // global middlewears
+2. middlewares -> (ctx) // global middlewares
 3. action (route action)
-5. onError (appName, e, ctx)
+4. onError (appName, e, ctx)
+
+### Invocation WebSocket steps
+
+1. wsContext -> context(appName, ctx)
+2. wsmiddlewares -> (ctx) // global middlewares
+3. action (ws action)
+4. onError (appName, e, ctx)
+
+### module Extensions -
+
+One module can add extensions for others
+
+```javascript
+    moduleExtensions(appName, ctx) {
+        const me = this;
+        return {
+            securityExt: async function (obj) {
+                // handle data from other modules
+            },
+            otherNameExt : async function (obj) {
+                // handle ..
+            },
+        };
+    }
+```
 
 ## Minimal module
 
@@ -36,6 +89,13 @@ config/apps.json
     "myapp": {
         "host": ["localhost"],
         "modules": ["myModuleName"]
+    },
+
+    "myapp-still-in-development": {
+        "host": ["dev.localhost"],
+        "arch": "modular",
+        "tags": ["dev", "someother"],
+        "modules": ["users", "page"]
     }
 }
 ```
@@ -63,8 +123,8 @@ node app/app.js
 -   aws
 -   files
 
-
 # bigger example module
+
 ```javascript
 // file usersModule.js
 export const usersModule = {
@@ -72,7 +132,7 @@ export const usersModule = {
 
     services(appName) {
         return  {
-            userServices: new UserServices(dbConnection); 
+            userServices: new UserServices(dbConnection);
         }
     }
 }
@@ -80,20 +140,20 @@ export const usersModule = {
 //file : myModule.js
 export const myModule = {
     moduleName: "myModuleName",
-    
+
     init(appName){
-        // do  stugff 
+        // do  stugff
     }
 
     services(appName) {
         return  {
-            myService: new MyService(dbConnection), 
+            myService: new MyService(dbConnection),
             myEmailService: //...
         }
     }
-    
+
     middlewares: (appName) =>([
-        globalMiddleWare, 
+        globalMiddleWare,
         (ctx) => {
             console.log("all request log")
         },
@@ -101,24 +161,24 @@ export const myModule = {
         //or manual middleware
         (ctx) => {
             if (ctx.req.is("POST")) {
-                // no post is allowed  
-                // return values will break stop the invocation 
+                // no post is allowed
+                // return values will break stop the invocation
                 return ctx.res.status(403);
             }
         }
     ])
-    
+
     routes: (appName) => {
         return {
             "/page": [
-                localMiddleware, 
+                localMiddleware,
                 (ctx)=>{
                     console.log("Invoked middle wears")
-                }, 
+                },
                 isMethod("get"),
                 isOwner("dataCollection", "_id")
                 hasRoles("PRODUCT_CREATOR", "ADMIN"),
-                validateGroupAccess(), 
+                validateGroupAccess(),
                 isAuthenticated()
 
                 async (ctx) => {
