@@ -1,14 +1,39 @@
 #
+Framework to improve reusability of code once written for different project. Framework force you to write code the way that can be resuable for different applications.
+
+For example. If You want to have different application with same layout and same user management but the content can be different. So You can reuse "users" and "admin" module in both projects. 
+
+Same with authorization or mail management or static page generation. 
 
 ## why?
 
-To improve reusability of code once written for different project. Framework force you to write code they way that it can be resuable for different applications.
+In my 10 years carrer I wrote so many code that it is dead now. And some projects were great. Usualy after some time I drop my project because of burnout. But then for example I have different idea, so again I write user registration, emails management, etc and again I'm geting burn. Then after some time I have idea .. maybe I will resurrect previous project. And then I see that tech I used was bad, my ideas for user management were bad. So this code is not usable anymore. In some cases it was written in different language (not sure why??).
 
-## What?
+I have user management from my last project so I would need to copy and update code. Well it wasn't easy and endup with two user-management that I need to mantain (burnout x^2). Same with mail management, Ux, UI etc. 
+ 
+So I thought wouldn't be nice to have some bigger building blocks even if I switch project then I will be ready :D. 
+
+That is why I have created framework that will support me with modularization and reusability. Example:
+
+app1: 
+- users, emails
+
+app2: 
+- users, emails, security 
+
+
+
+## Design patten and big limitation.
 
 Framework is a structure for
 
 -   monolith modularity ?
+
+And mainly created for monolith servers. 
+
+It can be be used microservices, but later you will need to split code base or deploy same codebase but with tags ( tags="user-microservice")
+
+
 
 ## HOW to run project
 
@@ -123,7 +148,7 @@ node app/app.js
 -   aws
 -   files
 
-# bigger example module
+## bigger example module
 
 ```javascript
 // file usersModule.js
@@ -194,3 +219,52 @@ export const myModule = {
     },
 };
 ```
+
+
+## Modules inheritance 
+
+Mupli allows to inherit functionality of other modules: 
+
+For example my new module can be full fledge application with UI that use "page" and "api" modules . 
+
+```javascript
+import path from "path";
+import { fileURLToPath } from "url";
+
+const currentFileDirectory = path.dirname(fileURLToPath(import.meta.url));
+
+class MyAppModule {
+    moduleName="myapp"
+    appPath= currentFileDirectory +"/src";
+    modules = ["page", "api"] //limited only to this module
+    // arch = "domain" // optional structure
+}
+
+```
+
+path of library can be custom. But In most caseses it will be ".node_modules/myapp/src"
+
+module structure: 
+
+- /src
+    - /page
+        - index.html
+        - something.html
+    - /api 
+        - ...
+
+
+in ourc config apps.json 
+```json
+{
+
+    "myCurrentApp": {
+        "hosts":["localhost"],
+        "modules": ["myapp", "other"], 
+    }
+
+}
+
+```
+
+Go to /something  or /index
