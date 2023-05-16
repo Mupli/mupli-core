@@ -1,7 +1,7 @@
 #
 Framework to improve reusability of code once written for different project. Framework force you to write code the way that can be resuable for different applications.
 
-For example. If You want to have different application with same layout and same user management but the content can be different. So You can reuse "users" and "admin" module in both projects. 
+For example. If You want to have different application with same layout and same user management but with different content. So You can reuse "users" and "admin" module in both projects. 
 
 Same with authorization or mail management or static page generation. 
 
@@ -13,15 +13,27 @@ I have user management from my last project so I would need to copy and update c
  
 So I thought wouldn't be nice to have some bigger building blocks even if I switch project then I will be ready :D. 
 
-That is why I have created framework that will support me with modularization and reusability. Example:
+That is why I have created framework that will support me with modularization and reusability.
+And modules by adding moduleName:
+Example:
+```json
+{
+    "app1": {
+        "host": ["app1.localhost"],
+        "modules": ["custom-module", "users", "page", "my-layout", "mail"]
+    },
 
-app1: 
-- users, emails
+    "app2": {
+        "host": ["app2.localhost"],
+        "modules": ["users", "page", "security", "cors", "mail", "my-layout", "cron"]
+    }
+}
+```
+Different modules can add different functionality. For example "mail" is my private (for now) module that adds mailSender service that use AWS mailer to send emails and read all templates from app/{appName}/mail/{names}.html. I wrote this once and now can reuse it in two different project app1 and app2. I just need to update the templates in app1 and and app2 or leave it and have default template.  
 
-app2: 
-- users, emails, security 
+Perfect example is "sitemap" as well, by adding it to modules- would be super easy. 
 
-
+This is just example, but You can have cms-module or admin-module and adjust its behavior for any project. 
 
 
 ## Design patten and big limitation.
@@ -45,7 +57,7 @@ node app/app.js
 or with tags:
 
 ```
-node app/app.js tags=dev,sit,someother
+node app/app.js tags=dev,sit,some-other
 ```
 
 Note this will run only projects with tags.
