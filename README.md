@@ -1,4 +1,4 @@
-#
+# Mupli framework
 Framework to improve reusability of code once written for different project. Framework force you to write code the way that can be resuable for different applications.
 
 For example. If You want to have different application with same layout and same user management but with different content. So You can reuse "users" and "admin" module in both projects. 
@@ -31,10 +31,12 @@ Example:
 ```
 Different modules can add different functionality. For example "mail" is my private (for now) module that adds mailSender service that use AWS mailer to send emails and read all templates from app/{appName}/mail/{names}.html. I wrote this once and now can reuse it in two different project app1 and app2. I just need to update the templates in app1 and and app2 or leave it and have default template.  
 
-Perfect example is "sitemap" as well, by adding it to modules- would be super easy. 
+Perfect example is "sitemap" as well, by adding it to project would be super easy. 
 
 This is just example, but You can have cms-module or admin-module and adjust its behavior for any project. 
 
+## Working examples 
+ https://github.com/Mupli/mupli-examples
 
 ## Design patten and big limitation.
 
@@ -44,7 +46,10 @@ Framework is a structure for
 
 And mainly created for monolith servers. 
 
-It can be be used microservices, but later you will need to split code base or deploy same codebase but with tags ( tags="user-microservice")
+### Microservices 
+It can be be used for microservices, but you will need to split code base or deploy same codebase but with tags ( tags="user-microservice"). I think for Startups and MVP go with monolith approach. If you start earning and find bootlenecks then split project in multiservices. 
+
+Important Tip: Code sharing between projects should be done via modules. If you share using node js imports/require you will endup with spagethi code and yout code will not be resuable nor split_able.  
 
 
 
@@ -66,11 +71,12 @@ Note this will run only projects with tags.
 
 ### Initialization steps
 
-0. init
-1. routes -> fn(app)
+- process inheritance modules 
+- init (app, config)
+- services -> services(appName, ctx)
+- moduleExtentions -> moduleExtentions(appName)
+- routes -> fn(app)
     - ws -> fn(app)
-2. services -> services(appName, ctx)
-3. moduleExtentions -> moduleExtentions(appName)
 
 ### Invocation steps
 
