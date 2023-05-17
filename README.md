@@ -75,7 +75,7 @@ Note this will run only projects with tags.
 - init (app, config)
 - services -> services(appName, ctx)
 - moduleExtentions -> moduleExtentions(appName)
-- routes -> fn(app)
+- routes(appName, serviceCtx) -> fn(app)
     - ws -> fn(app)
 
 ### Invocation steps
@@ -116,7 +116,7 @@ One module can add extensions for others
 ```javascript
 export const myModule = {
     moduleName: "myModuleName",
-    routes: (appName) => {
+    routes: (appName, serviceCtx) => {
         return {
             "/page": (ctx) => {
                 return "OK";
@@ -172,11 +172,11 @@ node app/app.js
 ```javascript
 // file usersModule.js
 export const usersModule = {
-    moduleName: "myModuleName",
+    moduleName: "usersModule",
 
-    services(appName) {
+    services(appName, ctx) {
         return  {
-            userServices: new UserServices(dbConnection);
+            userServices: new UserServices(ctx.dbConnection);
         }
     }
 }
@@ -189,9 +189,11 @@ export const myModule = {
         // do  stugff
     }
 
-    services(appName) {
+    services(appName, ctx) {
         return  {
-            myService: new MyService(dbConnection),
+            //userServices can be because was before in config.json (modules: ["usersModule", "myModuleName"])
+            myService: new MyService(dbConnection, ctx.userServices), 
+            
             myEmailService: //...
         }
     }
@@ -212,7 +214,7 @@ export const myModule = {
         }
     ])
 
-    routes: (appName) => {
+    routes: (appName, serviceCtx) => { //no ctx details -  request, response, ...
         return {
             "/page": [
                 localMiddleware,
