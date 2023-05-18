@@ -75,14 +75,14 @@ Note this will run only projects with tags.
 - init (app, config)
 - services -> services(appName, ctx)
 - moduleExtentions -> moduleExtentions(appName)
-- routes(appName, serviceCtx) -> fn(app)
+- routes({appName}, serviceCtx) -> fn(app)
     - ws -> fn(app)
 
 ### Invocation steps
 
 0. dispatch //TODO
 1. context -> context(appName, ctx)
-2. middlewares -> (ctx) // global middlewares
+2. middlewares (appName, config) => return fn (ctx) {} // global middlewares
 3. action (route action)
 4. onError (appName, e, ctx)
 
