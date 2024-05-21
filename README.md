@@ -7,14 +7,14 @@ Same with authorization or mail management or static page generation.
 
 ## why?
 
-In my 10 years carrer I wrote so many code that it is dead now. And some projects were great. Usualy after some time I drop my project because of burnout. But then for example I have different idea, so again I write user registration, emails management, etc and again I'm geting burn. Then after some time I have idea .. maybe I will resurrect previous project. And then I see that tech I used was bad, my ideas for user management were bad. So this code is not usable anymore. In some cases it was written in different language (not sure why??).
+In my 10-year career, I've written a lot of code, much of which is now obsolete. Some of my projects were great, but I often end up abandoning them due to burnout. Then, a new idea strikes, and I find myself writing user registration, email management, etc., all over again, only to burn out once more. Eventually, I consider reviving an old project but realize that the technology I used is outdated and my approaches were flawed, rendering the code unusable. Sometimes, I even discover it was written in a different language for reasons I can't recall.
 
-I have user management from my last project so I would need to copy and update code. Well it wasn't easy and endup with two user-management that I need to mantain (burnout x^2). Same with mail management, Ux, UI etc. 
- 
-So I thought wouldn't be nice to have some bigger building blocks even if I switch project then I will be ready :D. 
+For example, I have a user management system from my last project that I need to update and integrate. This process wasn't straightforward and resulted in two user management systems that both require maintenance, doubling my burnout. The same problem arises with email management, UX, UI, and other components.
 
-That is why I have created framework that will support me with modularization and reusability.
-And modules by adding moduleName:
+I thought, wouldn’t it be nice to have some larger building blocks so that even if I switch projects, I’ll be ready?
+
+That's why I created a framework that supports modularization and reusability, allowing me to add modules seamlessly. For example, by simply adding a module name, I can streamline my development process and reduce redundancy.
+
 Example:
 ```json
 {
@@ -72,7 +72,7 @@ Note this will run only projects with tags.
 ### Initialization steps
 
 - process inheritance modules 
-- init (app, config)
+- init (app, bootConfig)
 - services -> services(appName, ctx)
 - moduleExtentions -> moduleExtentions(appName)
 - routes({appName}, serviceCtx) -> fn(app)
