@@ -1,136 +1,108 @@
-# Mupli framework
-Framework to improve reusability of code once written for different project. Framework force you to write code the way that can be resuable for different applications.
+# Mupli Framework Documentation
 
-For example. If You want to have different application with same layout and same user management but with different content. So You can reuse "users" and "admin" module in both projects. 
+Mupli is a modular framework designed to enhance code reusability across different projects. It enforces a structure that promotes the creation of reusable components, enabling developers to maintain consistency and efficiency in their codebase. This documentation will guide you through the core concepts, usage, and advanced features of Mupli.
 
-Same with authorization or mail management or static page generation. 
+## Why Mupli?
 
-## why?
+Over a decade-long career, repetitive tasks like user registration and email management often lead to burnout. The Mupli framework addresses this by providing a way to modularize and reuse code across projects. This approach minimizes redundancy and maximizes the reuse of well-tested components.
 
-In my 10-year career, I've written a lot of code, much of which is now obsolete. Some of my projects were great, but I often end up abandoning them due to burnout. Then, a new idea strikes, and I find myself writing user registration, email management, etc., all over again, only to burn out once more. Eventually, I consider reviving an old project but realize that the technology I used is outdated and my approaches were flawed, rendering the code unusable. Sometimes, I even discover it was written in a different language for reasons I can't recall.
+## Key Features
 
-For example, I have a user management system from my last project that I need to update and integrate. This process wasn't straightforward and resulted in two user management systems that both require maintenance, doubling my burnout. The same problem arises with email management, UX, UI, and other components.
+- **Modular Architecture**: Break down applications into reusable modules.
+- **Easy Configuration**: Use JSON configurations to manage modules across different projects.
+- **Monolith and Microservices Support**: Start with a monolith and scale to microservices as needed.
+- **Lifecycle Management**: Clearly defined steps for initialization and invocation.
 
-I thought, wouldn’t it be nice to have some larger building blocks so that even if I switch projects, I’ll be ready?
+## Example Configuration
 
-That's why I created a framework that supports modularization and reusability, allowing me to add modules seamlessly. For example, by simply adding a module name, I can streamline my development process and reduce redundancy.
-
-Example:
 ```json
 {
     "app1": {
         "host": ["app1.localhost"],
         "modules": ["custom-module", "users", "page", "my-layout", "mail"]
     },
-
     "app2": {
         "host": ["app2.localhost"],
         "modules": ["users", "page", "security", "cors", "mail", "my-layout", "cron"]
     }
 }
 ```
-Different modules can add different functionality. For example "mail" is my private (for now) module that adds mailSender service that use AWS mailer to send emails and read all templates from app/{appName}/mail/{names}.html. I wrote this once and now can reuse it in two different project app1 and app2. I just need to update the templates in app1 and and app2 or leave it and have default template.  
 
-Perfect example is "sitemap" as well, by adding it to project would be super easy. 
+## Getting Started
 
-This is just example, but You can have cms-module or admin-module and adjust its behavior for any project. 
+### Running the Project
 
-## Working examples 
- https://github.com/Mupli/mupli-examples
+To start a Mupli project, run:
 
-## Design pattern and big limitation.
-
-Framework is a structure for
-
--   monolith modularity ?
-
-And mainly created for monolith servers. 
-
-### Microservices 
-It can be be used for microservices, but you will need to split code base or deploy same codebase but with tags ( tags="user-microservice"). I think for Startups and MVP go with monolith approach. If you start earning and find bootlenecks then split project in multiservices. 
-
-Important Tip: Code sharing between projects should be done via modules. If you share using node js imports/require you will endup with spagethi code and yout code will not be resuable nor split_able.  
-
-
-
-## HOW to run project
-
-```
+```bash
 node app/app.js
 ```
 
-or with tags:
+You can also run with specific tags:
 
-```
+```bash
 node app/app.js tags=dev,sit,some-other
 ```
 
-Note this will run only projects with tags.
+This will only run projects with the specified tags.
 
+### Project Structure
 
+#### Initialization Steps
 
-## LifeCycle
+1. **Process Inheritance Modules**: Handles module inheritance.
+2. **Init**: Initialize the application with `appName` and `bootConfig`.
+3. **Services**: Initialize services with `bootConfig` and `ctx`.
+4. **Module Extensions**: Apply module extensions using `appName`.
+5. **Routes**: Set up routes using `appConfig` and `serviceCtx`.
 
-### Initialization steps
+#### Invocation Steps
 
-- process inheritance modules 
-- init (appName, bootConfig)
-- services -> services(bootConfig, ctx)
-- moduleExtentions -> moduleExtentions(appName)
-- routes(appConfig, serviceCtx) -> fn(app)
-    - ws -> fn(app)
+1. **Dispatch**: (TODO)
+2. **Context**: Set up request context.
+3. **Middlewares**: Apply global middlewares.
+4. **Action**: Execute route action.
+5. **OnError**: Handle errors.
 
-## Parent Initialization steps
-1. init (appName, bootConfig)
-2. services -> services(bootConfig, ctx)
-3. moduleExtentions -> moduleExtentions(appName)
-4. routes   
+### WebSocket Invocation Steps
 
-### Invocation steps
+1. **WS Context**: Set up WebSocket context.
+2. **WS Middlewares**: Apply WebSocket middlewares.
+3. **Action**: Execute WebSocket action.
+4. **OnError**: Handle WebSocket errors.
 
-0. dispatch //TODO
-1. context -> context(appName, ctx)
-2. middlewares (appName, config) => return fn (ctx) {} // global middlewares
-3. action (route action)
-4. onError (appName, e, ctx)
+### App Configuration
 
-### Invocation WebSocket steps
+Define your application configuration in `config/apps.json`:
 
-1. wsContext -> context(appName, ctx)
-2. wsmiddlewares -> (ctx) // global middlewares
-3. action (ws action)
-4. onError (appName, e, ctx)
-
-### appConfig 
-```json 
+```json
 {
     "appName": "appName",
-    build: this.build,
-    appPath: rootPath,
-    //modular directiors example : product, groups,
-    localModules: ["some", "aaa", "product"]
+    "build": "this.build",
+    "appPath": "rootPath",
+    "localModules": ["some", "aaa", "product"]
 }
 ```
 
-### module Extensions -
+### Module Extensions
 
-One module can add extensions for others
+Modules can extend the functionality of other modules:
 
 ```javascript
-    moduleExtensions(appName, ctx) {
-        const me = this;
-        return {
-            securityExt: async function (obj) {
-                // handle data from other modules
-            },
-            otherNameExt : async function (obj) {
-                // handle ..
-            },
-        };
-    }
+moduleExtensions(appName, ctx) {
+    const me = this;
+    return {
+        securityExt: async function (obj) {
+            // handle data from other modules
+        },
+        otherNameExt: async function (obj) {
+            // handle ..
+        },
+    };
+}
 ```
 
-## Minimal module
+## Creating a Minimal Module
 
 ```javascript
 export const myModule = {
@@ -145,7 +117,7 @@ export const myModule = {
 };
 ```
 
-config/apps.json
+Add the module to your app configuration:
 
 ```json
 {
@@ -153,7 +125,6 @@ config/apps.json
         "host": ["localhost"],
         "modules": ["myModuleName"]
     },
-
     "myapp-still-in-development": {
         "host": ["dev.localhost"],
         "arch": "modular",
@@ -163,7 +134,7 @@ config/apps.json
 }
 ```
 
-app/app.js
+## Example App Initialization
 
 ```javascript
 new Mupli() //
@@ -171,22 +142,28 @@ new Mupli() //
     .listen(3000);
 ```
 
+Run the app:
+
+```bash
 node app/app.js
+```
 
-## MODULES
+## Available Modules
 
--   page - html page renderer module
--   api - Rest module
--   mail - mail sender module
--   newsletter
--   user
--   register
--   product
--   cron
--   aws
--   files
+- **page**: HTML page renderer module
+- **api**: REST module
+- **mail**: Mail sender module
+- **newsletter**
+- **user**
+- **register**
+- **product**
+- **cron**
+- **aws**
+- **files**
 
-## bigger example module
+## Advanced Module Example
+
+### User Module
 
 ```javascript
 // file usersModule.js
@@ -194,64 +171,61 @@ export const usersModule = {
     moduleName: "usersModule",
 
     services(appName, ctx) {
-        return  {
+        return {
             userServices: new UserServices(ctx.dbConnection);
         }
     }
-}
+};
+```
 
+### Custom Module
+
+```javascript
 //file : myModule.js
 export const myModule = {
     moduleName: "myModuleName",
 
-    init(appName){
-        // do  stugff
-    }
+    init(appName) {
+        // Initialization logic
+    },
 
     services(appName, ctx) {
-        return  {
-            //userServices can be because was before in config.json (modules: ["usersModule", "myModuleName"])
-            myService: new MyService(dbConnection, ctx.userServices), 
-            
+        return {
+            myService: new MyService(dbConnection, ctx.userServices),
             myEmailService: //...
         }
-    }
+    },
 
-    middlewares: (appName) =>([
+    middlewares: (appName) => [
         globalMiddleWare,
         (ctx) => {
-            console.log("all request log")
+            console.log("all request log");
         },
-        isMethod("post", "patch"), //use mupli-middlewares
-        //or manual middleware
+        isMethod("post", "patch"),
         (ctx) => {
             if (ctx.req.is("POST")) {
-                // no post is allowed
-                // return values will break stop the invocation
                 return ctx.res.status(403);
             }
         }
-    ])
+    ],
 
-    routes: (appName, serviceCtx) => { //no ctx details -  request, response, ...
+    routes: (appName, serviceCtx) => {
         return {
             "/page": [
                 localMiddleware,
-                (ctx)=>{
-                    console.log("Invoked middle wears")
+                (ctx) => {
+                    console.log("Invoked middlewares");
                 },
                 isMethod("get"),
-                isOwner("dataCollection", "_id")
+                isOwner("dataCollection", "_id"),
                 hasRoles("PRODUCT_CREATOR", "ADMIN"),
                 validateGroupAccess(),
-                isAuthenticated()
-
+                isAuthenticated(),
                 async (ctx) => {
-                    // my do logic
-                    const myData = await ctx.req.json()
-                    const savedMyDate = await myService.save(myData)
+                    const myData = await ctx.req.json();
+                    const savedMyDate = await myService.save(myData);
 
-                    await ctx.userService.saveRelation(ctx.auth.id, myData.id)
+                    await ctx.userService.saveRelation(ctx.auth.id, myData.id);
                     return ctx.res.ok();
                 }
             ]
@@ -260,12 +234,11 @@ export const myModule = {
 };
 ```
 
+## Module Inheritance
 
-## Modules inheritance 
+Mupli allows modules to inherit functionality from other modules:
 
-Mupli allows to inherit functionality of other modules: 
-
-For example my new module can be full fledge application with UI that use "page" and "api" modules . 
+### Example
 
 ```javascript
 import path from "path";
@@ -274,49 +247,31 @@ import { fileURLToPath } from "url";
 const currentFileDirectory = path.dirname(fileURLToPath(import.meta.url));
 
 class MyAppModule {
-    moduleName="myapp"
-    appPath= currentFileDirectory +"/src";
-    modules = ["page", "api"] //limited only to this module
-    // arch = "domain" // optional structure
+    moduleName = "myapp";
+    appPath = currentFileDirectory + "/src";
+    modules = ["page", "api"];
 }
-
 ```
 
-path of library can be custom. But In most caseses it will be ".node_modules/myapp/src"
+Define your module structure in `config/apps.json`:
 
-module structure: 
-
-- /src
-    - /page
-        - index.html
-        - something.html
-    - /api 
-        - ...
-
-
-in ourc config apps.json 
 ```json
 {
-
     "myCurrentApp": {
-        "hosts":["localhost"],
-        "modules": ["myapp", "other"], 
+        "hosts": ["localhost"],
+        "modules": ["myapp", "other"]
     }
-
 }
-
 ```
 
-Go to /something  or /index
+## Advanced REST-Style Routing
 
-## Other Examples 
-### Advance REST-style routing for page module (works in mupli-api too) 
-
+### Example
 
 ```js
 import { executeOn, isAuthenticated, isMethod } from "mupli-lib-middlewares";
 
-export const init = [ 
+export const init = [
     isAuthenticated(),
     executeOn(isMethod("post", "put"), _updateProject),
     executeOn(isMethod("get"), _getProject),
@@ -325,7 +280,11 @@ export const init = [
 ];
 
 function _updateProject(ctx) {
-    //Do stuff
-    return {status:"OK"}
+    // Do stuff
+    return { status: "OK" };
 }
 ```
+
+## Conclusion
+
+Mupli is a powerful framework that facilitates code reusability and modularization, making it easier to manage and maintain projects. By following the structure and guidelines provided, developers can create scalable and maintainable applications efficiently.
