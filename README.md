@@ -38,7 +38,7 @@ This is just example, but You can have cms-module or admin-module and adjust its
 ## Working examples 
  https://github.com/Mupli/mupli-examples
 
-## Design patten and big limitation.
+## Design pattern and big limitation.
 
 Framework is a structure for
 
@@ -67,16 +67,24 @@ node app/app.js tags=dev,sit,some-other
 
 Note this will run only projects with tags.
 
+
+
 ## LifeCycle
 
 ### Initialization steps
 
 - process inheritance modules 
-- init (app, bootConfig)
-- services -> services(appName, ctx)
+- init (appName, bootConfig)
+- services -> services(bootConfig, ctx)
 - moduleExtentions -> moduleExtentions(appName)
-- routes({appName}, serviceCtx) -> fn(app)
+- routes(appConfig, serviceCtx) -> fn(app)
     - ws -> fn(app)
+
+## Parent Initialization steps
+1. init (appName, bootConfig)
+2. services -> services(bootConfig, ctx)
+3. moduleExtentions -> moduleExtentions(appName)
+4. routes   
 
 ### Invocation steps
 
@@ -92,6 +100,17 @@ Note this will run only projects with tags.
 2. wsmiddlewares -> (ctx) // global middlewares
 3. action (ws action)
 4. onError (appName, e, ctx)
+
+### appConfig 
+```json 
+{
+    "appName": "appName",
+    build: this.build,
+    appPath: rootPath,
+    //modular directiors example : product, groups,
+    localModules: ["some", "aaa", "product"]
+}
+```
 
 ### module Extensions -
 
@@ -289,3 +308,24 @@ in ourc config apps.json
 ```
 
 Go to /something  or /index
+
+## Other Examples 
+### Advance REST-style routing for page module (works in mupli-api too) 
+
+
+```js
+import { executeOn, isAuthenticated, isMethod } from "mupli-lib-middlewares";
+
+export const init = [ 
+    isAuthenticated(),
+    executeOn(isMethod("post", "put"), _updateProject),
+    executeOn(isMethod("get"), _getProject),
+    executeOn(isMethod("delete"), _deleteProject),
+    (ctx) => ctx.res.status("405"),
+];
+
+function _updateProject(ctx) {
+    //Do stuff
+    return {status:"OK"}
+}
+```
