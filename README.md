@@ -8,27 +8,51 @@ Over a decade-long career, repetitive tasks like user registration and email man
 
 ## Key Features
 
-- **Modular Architecture**: Break down applications into reusable modules.
-- **Easy Configuration**: Use JSON configurations to manage modules across different projects.
-- **Monolith and Microservices Support**: Start with a monolith and scale to microservices as needed.
-- **Lifecycle Management**: Clearly defined steps for initialization and invocation.
+-   **Modular Architecture**: Break down applications into reusable modules.
+-   **Easy Configuration**: Use JSON configurations to manage modules across different projects.
+-   **Monolith and Microservices Support**: Start with a monolith and scale to microservices as needed.
+-   **Lifecycle Management**: Clearly defined steps for initialization and invocation.
 
-## Example Configuration
+## One node server but two websites
+
+Configuration file:
+`/root/config/apps.json`
 
 ```json
 {
-    "app1": {
+    "myProject1": {
         "host": ["app1.localhost"],
         "modules": ["custom-module", "users", "page", "my-layout", "mail"]
     },
     "app2": {
         "host": ["app2.localhost"],
-        "modules": ["users", "page", "security", "cors", "mail", "my-layout", "cron"]
+        "modules": [
+            "users",
+            "page",
+            "security",
+            "cors",
+            "mail",
+            "my-layout",
+            "cron"
+        ],
+        "tags": ["dev", "some-other"]
     }
 }
 ```
 
 ## Getting Started
+
+### Instalation 
+
+`npm install mupli-core`
+
+Note: you need to create minimal folder structure. Please check [https://github.com/Mupli/mupli-examples/tree/main/example-api](https://github.com/Mupli/mupli-examples/tree/main/example-api) 
+- /config/apps.json
+- /app/app.js
+- /app/myProject1/api/test.js
+
+That is it!! Not you just need to run it. 
+
 
 ### Running the Project
 
@@ -47,6 +71,80 @@ node app/app.js tags=dev,sit,some-other
 This will only run projects with the specified tags.
 
 ### Project Structure
+
+#### Directories
+
+```
+ /root
+    /app
+        - app.js
+        /[projectName]
+            /api
+            - users.js  - user controller
+            /page
+            /cron       - cron job definitions (mupli-cron module)
+        /[modularProject]
+            /user
+                /api
+                /cron    - same as /cron
+                /page    - directory with html templates (mupli-page or mupli-handlebar)
+            /mail
+                /mailer  - mailer (mupli-mail)
+                /cron    - same as /cron
+            /products
+                /static  - some example
+                /events  - event handlers (mupli-events module)
+    /config
+        - apps.json
+
+```
+
+Minimal dirctory structure
+
+```
+/root/app/app.js
+/root/app/myProject/api/users.js
+/root/config/apps.json
+```
+
+### Simplified Api example
+
+/root/app/myProject/api/users.js
+
+```js
+import { executeOn, isAuthenticated, isMethod } from "mupli-lib-middlewares";
+
+
+// Exported method (api/[fileName]/search)
+export async function search({req, res, userService}) {
+    const name = req.param("userName");
+    const users = await userService.findAllByName(name);
+    return ctx.res.json(users);
+}
+
+// Exported root method (takes file name)
+export const init = [
+    isAuthenticated(),
+    executeOn(isMethod("post", "put"), _createOrUpdateUser),
+    executeOn(isMethod("delete"), _deleteUser),
+    (ctx) => ctx.res.status("405"),
+];
+
+async function _createOrUpdateUser({req, userService}) {
+    const user = await ctx.req.json();
+    // Do stuff
+    await userService.save(user);
+    return { status: "OK" };
+}
+
+
+
+```
+
+- url: GET localhost:3000/api/users/search
+- url: POST localhost:3000/api/users
+
+## Modules development
 
 #### Initialization Steps
 
@@ -77,10 +175,12 @@ Define your application configuration in `config/apps.json`:
 
 ```json
 {
-    "appName": "appName",
-    "build": "this.build",
-    "appPath": "rootPath",
-    "localModules": ["some", "aaa", "product"]
+    "test": {
+        "hosts": ["localhost", "www.example.com"],
+        "tags": ["dev", "prod"],
+        "modules": ["page", "store", "api", "services"],
+        "arch": "modular"
+    }
 }
 ```
 
@@ -150,16 +250,16 @@ node app/app.js
 
 ## Available Modules
 
-- **page**: HTML page renderer module
-- **api**: REST module
-- **mail**: Mail sender module
-- **newsletter**
-- **user**
-- **register**
-- **product**
-- **cron**
-- **aws**
-- **files**
+-   **page**: HTML page renderer module
+-   **api**: REST module
+-   **mail**: Mail sender module
+-   **newsletter**
+-   **user**
+-   **register**
+-   **product**
+-   **cron**
+-   **aws**
+-   **files**
 
 ## Advanced Module Example
 
@@ -261,27 +361,6 @@ Define your module structure in `config/apps.json`:
         "hosts": ["localhost"],
         "modules": ["myapp", "other"]
     }
-}
-```
-
-## Advanced REST-Style Routing
-
-### Example
-
-```js
-import { executeOn, isAuthenticated, isMethod } from "mupli-lib-middlewares";
-
-export const init = [
-    isAuthenticated(),
-    executeOn(isMethod("post", "put"), _updateProject),
-    executeOn(isMethod("get"), _getProject),
-    executeOn(isMethod("delete"), _deleteProject),
-    (ctx) => ctx.res.status("405"),
-];
-
-function _updateProject(ctx) {
-    // Do stuff
-    return { status: "OK" };
 }
 ```
 
