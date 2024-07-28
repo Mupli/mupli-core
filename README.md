@@ -42,7 +42,7 @@ Configuration file:
 
 ## Getting Started
 
-### Instalation 
+### Installation 
 
 `npm install mupli-core`
 
@@ -51,7 +51,7 @@ Note: you need to create minimal folder structure. Please check [https://github.
 - /app/app.js
 - /app/myProject1/api/test.js
 
-That is it!! Not you just need to run it. 
+That is it!! Now you just need to run it. 
 
 
 ### Running the Project
