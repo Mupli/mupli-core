@@ -1,6 +1,6 @@
 {
   "name": "mupli-core",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "",
   "main": "lib/mupli-core.js",
   "type": "module",
@@ -16,6 +16,8 @@
   "dependencies": {
     "fast-querystring": "^1.1.1",
     "mupli-api": "^1.0.0",
-    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.29.0"
+    "uuid": "^10.0.0",
+    "klona": "^2.0.6",
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.44.0"
   }
 }
