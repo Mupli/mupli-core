@@ -70,6 +70,14 @@ node app/app.js tags=dev,sit,some-other
 
 This will only run projects with the specified tags.
 
+
+You can also set override port:
+
+```bash
+node app/app.js tags=dev,sit,some-other port=14515
+```
+port added to allow multiple applications on run. (e.g. Docker deplyment or testing)
+
 ### Project Structure
 
 #### Directories
@@ -206,6 +214,11 @@ moduleExtensions(appName, ctx) {
 
 ```javascript
 export const myModule = {
+    alias: "aliasOfMyModuleName",
+    //namespace = "root"
+    //_nsName = "page"
+    // appPath = path.dirname(fileURLToPath(import.meta.url)) + "/src";
+
     moduleName: "myModuleName",
     routes: (appName, serviceCtx) => {
         return {
@@ -229,10 +242,15 @@ Add the module to your app configuration:
         "host": ["dev.localhost"],
         "arch": "modular",
         "tags": ["dev", "someother"],
-        "modules": ["users", "page"]
+        "modules": ["users", "page", "aliasOfMyModuleName"]
     }
 }
 ```
+
+### Advanced optional value:
+- namespace = "root" -  namespace for  all module data. optional as default is "root" if not added it uses the moduleName 
+- _nsName = "page"  - to use namespace of different module.. if we wont to enrich or use its data.
+- appPath - sometimes we need to read module files from directory of module. Example shows how to achieve it. 
 
 ## Example App Initialization
 
@@ -365,5 +383,55 @@ Define your module structure in `config/apps.json`:
 ```
 
 ## Conclusion
-
 Mupli is a powerful framework that facilitates code reusability and modularization, making it easier to manage and maintain projects. By following the structure and guidelines provided, developers can create scalable and maintainable applications efficiently.
+
+
+## TODO 
+* improve Api
+```javascript 
+
+var m = Mupli.init()
+    .module(swagger)
+    .module(character)
+    
+    //DONE
+    .loadApp("redscan")
+    .loadApp(readscan)
+
+    //TODO
+    .app("redscan", {
+        "hosts": [
+            "red.local",
+            "red.mupli.us"
+        ],
+        "tags": [
+            "red",
+            "us-dev"
+        ],
+        "modules": [
+            "page",
+            "api",
+            "locale",
+            "store",
+            "errors",
+            "users",
+            "users-registration",
+            "crudi",
+            "startup-layout",
+            "cron",
+            "sitemap",
+            "security",
+            "reddit-client",
+            "services",
+            "admin-panel"
+        ]
+    })
+
+    .useDefault(["page"])
+    .use(["page"])
+    .use("test.local", ["api", "swagger","character","page"])
+    .useAll("root.local")
+
+export default m;
+//.listen(3000) should be invoked in command line
+```

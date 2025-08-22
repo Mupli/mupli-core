@@ -35,8 +35,8 @@ Note: this was done so there will be no double processing of things that can be 
 ### How Config works 
 Processing starts from the root overriding previous configs. 
 1. Root/config/
-2. previous overriden by: Module/config/
-3. previous overriden by: app/[appName]/config/ 
+2.  previous overriden (1.) by: Module/config/
+3. previous overriden (2.) by: app/[appName]/config/ 
 
 
 ## Api examples 
