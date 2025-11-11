@@ -15,10 +15,34 @@ Over a decade-long career, repetitive tasks like user registration and email man
 
 ## One node server but two websites
 
+```javascript 
+
+const app1 = Mupli.init()
+    .name("app1")
+    .host("www.app1.com")
+    .modules(["users", "page"]);
+
+const app2 = Mupli.init()
+    .name("app2")
+    .host("mail.app2.com")
+    .modules(["mail", "page"]);
+
+
+const server = Mupli.init()
+    .loadApp(app1)
+    .loadApp(app2)
+    .listen(3000);
+
+```
+
+
+OR json way:
+
 Configuration file:
 `/root/config/apps.json`
 
 ```json
+
 {
     "myProject1": {
         "host": ["app1.localhost"],
@@ -248,9 +272,26 @@ Add the module to your app configuration:
 ```
 
 ### Advanced optional value:
-- namespace = "root" -  namespace for  all module data. optional as default is "root" if not added it uses the moduleName 
+- namespace = "root" -  data namespace for all module data. optional as default is "root" if not added it uses the moduleName 
 - _nsName = "page"  - to use namespace of different module.. if we wont to enrich or use its data.
 - appPath - sometimes we need to read module files from directory of module. Example shows how to achieve it. 
+
+```javascrip 
+app.module(()=>{
+        let lm = new LocalizationModule();
+        lm.namespace="admin-layout";
+
+        lm.alias="admin-locale";
+        lm.moduleName="locale";
+        return lm;
+    })
+````
+- locale will use same data namespace as : admin-layout 
+- alias "will be loaded by {modules: [admin-locale]}"
+- moduleName - will load json files from appName/locale directory
+
+Usually moduleName and alias is same value, but for some reason you want to have two modules that read from same module directory ("/locale"). 
+
 
 ## Example App Initialization
 
